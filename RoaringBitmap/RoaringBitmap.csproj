@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <PackageProjectUrl>https://github.com/Tornhoof/RoaringBitmap</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/Tornhoof/RoaringBitmap/blob/master/LICENSE</PackageLicenseUrl>
     <PackageTags>RoaringBitmap</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/Tornhoof/RoaringBitmap</RepositoryUrl>
-    <Version>0.9.1</Version>
+    <Version>1.0.0</Version>
     <Description>RoaringBitmap for .NET</Description>
     <Authors>RoaringBitmap Contributors</Authors>
     <Copyright>Copyright © RoaringBitmap Contributors 2017</Copyright>
