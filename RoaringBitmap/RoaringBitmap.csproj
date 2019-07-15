@@ -13,6 +13,7 @@
     <Copyright>Copyright © RoaringBitmap Contributors 2017</Copyright>
     <Product>Roaring Bitmap</Product>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
