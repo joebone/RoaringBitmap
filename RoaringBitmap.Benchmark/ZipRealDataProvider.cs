@@ -27,16 +27,13 @@ namespace RoaringBitmap.Benchmark
         {
             foreach (var zipArchiveEntry in m_Archive.Entries)
             {
-                using (var stream = zipArchiveEntry.Open())
-                {
-                    using (var stringReader = new StreamReader(stream))
-                    {
-                        var split = stringReader.ReadLine().Split(',');
-                        var values = split.Select(int.Parse).ToList();
-                        var bitmap = Collections.Special.RoaringBitmap.Create(values);
-                        yield return bitmap.Optimize();
-                    }
-                }
+                using var stream = zipArchiveEntry.Open();
+                using var stringReader = new StreamReader(stream);
+
+                var split = stringReader.ReadLine().Split(',');
+                var values = split.Select(int.Parse).ToList();
+                var bitmap = Collections.Special.RoaringBitmap.Create(values);
+                yield return bitmap.Optimize();
             }
         }
 

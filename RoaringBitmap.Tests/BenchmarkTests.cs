@@ -215,11 +215,10 @@ namespace RoaringBitmap.Tests
                 Collections.Special.RoaringBitmap[] bitmaps;
                 if (!m_BitmapDictionary.TryGetValue(name, out bitmaps))
                 {
-                    using (var provider = new ZipRealDataProvider(Path.Combine(m_Path, name)))
-                    {
-                        bitmaps = provider.ToArray();
-                        m_BitmapDictionary[name] = bitmaps;
-                    }
+                    using var provider = new ZipRealDataProvider(Path.Combine(m_Path, name));
+
+                    bitmaps = provider.ToArray();
+                    m_BitmapDictionary[name] = bitmaps;
                 }
                 return bitmaps;
             }

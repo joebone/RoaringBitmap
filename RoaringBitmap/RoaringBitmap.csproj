@@ -1,10 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-    <PackageProjectUrl>https://github.com/Tornhoof/RoaringBitmap</PackageProjectUrl>
+    <!--<TargetFramework>netcoreapp3.0</TargetFramework>-->
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!--<PackageProjectUrl>https://github.com/Tornhoof/RoaringBitmap</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/Tornhoof/RoaringBitmap/blob/master/LICENSE</PackageLicenseUrl>
     <PackageTags>RoaringBitmap</PackageTags>
+    <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/Tornhoof/RoaringBitmap</RepositoryUrl>
     <Version>1.0.0</Version>
@@ -14,14 +16,15 @@
     <Product>Roaring Bitmap</Product>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <Guid>2ee1be04-a8f5-4358-bf08-e417d3916b49</Guid>-->
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.Runtime" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
 
 </Project>
