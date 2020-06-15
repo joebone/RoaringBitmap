@@ -3,6 +3,7 @@
   <PropertyGroup>
     <!--<TargetFramework>netcoreapp3.0</TargetFramework>-->
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!--<PackageProjectUrl>https://github.com/Tornhoof/RoaringBitmap</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/Tornhoof/RoaringBitmap/blob/master/LICENSE</PackageLicenseUrl>
     <PackageTags>RoaringBitmap</PackageTags>
@@ -17,14 +18,6 @@
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <Guid>2ee1be04-a8f5-4358-bf08-e417d3916b49</Guid>-->
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
 </Project>
