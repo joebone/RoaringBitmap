@@ -8,7 +8,7 @@ using static System.Runtime.Intrinsics.X86.Avx2;
 using System.Numerics;
 using System.Runtime.Intrinsics;
 
-namespace Collections.Special {
+namespace Collections.Special.Simd {
     internal class RoaringArray : IEnumerable<int>, IEquatable<RoaringArray> {
         private const int SerialCookieNoRuncontainer = 12346;
         private const int SerialCookie = 12347;
@@ -70,12 +70,75 @@ namespace Collections.Special {
                 return false;
             }
 
-            for (var i = 0; i < m_Size; i++) {
-                if ((m_Keys[i] != other.m_Keys[i]) || !m_Values[i].Equals(other.m_Values[i])) {
-                    return false;
+            var size = Vector<ushort>.Count;
+            if (Vector.IsHardwareAccelerated && m_Size >= size) {
+                Vector256<ushort> va;
+                Vector256<ushort> vb;
+
+                unsafe {
+                    fixed (ushort* srcPtr = m_Keys)
+                    fixed (ushort* cmpPtr = other.m_Keys) {
+                        var i = 0;
+                        while (i < m_Size) {
+
+                            //var aligned = (int*)(((ulong)srcPtr + 31UL) & ~31UL);
+                            //var pos = (int)(aligned - srcPtr);
+                            //var final = Sum(ptr, pos);
+
+                            //var vaa = Avx.LoadAlignedVector256(srcPtr);
+                            //var vab = Avx.LoadAlignedVector256(cmpPtr);
+
+                            va = Avx.LoadVector256(srcPtr);
+                            vb = Avx.LoadVector256(cmpPtr);
+
+                            //var vaa = (src);
+                            //var vab = Avx2.load.LoadAlignedVector256(cmp);
+
+                            var result = Avx2.CompareEqual(va, vb);
+                            //System.Runtime.Intrinsics.X86.Popcnt
+
+                            if ((uint)Avx2.MoveMask(result.AsByte()) != 0xffffffff) //if (vaa == vab)
+                                return false;
+
+                            //Avx2.Shuffle()
+                            //va = new Vector<ushort>(src)
+                            i += size;
+                        }
+                    }
+
+
+                    //for (var i = 0; i < m_Size; i += size) {
+                    //    va = new Vector<ushort>(m_Keys.AsSpan(i, size));
+                    //    vb = new Vector<ushort>(other.m_Keys.AsSpan(i, size));
+                    //    if (va == vb)
+                    //        continue;
+
+                    //    for (int j = i, max = j + size; j < max; j++) {
+                    //        if (!m_Values[j].Equals(other.m_Values[j]))
+                    //            return false;
+                    //    }
+                    //    //Avx2.PermuteVar8x32()
+                    //    //Avx2.Shuffle(.shu
+                    //}
+                }
+                //    for (var i = 0; i < m_Size; i++)
+                //{
+                //    if ((m_Keys[i] != other.m_Keys[i]) || !m_Values[i].Equals(other.m_Values[i]))
+                //    {
+                //        return false;
+                //    }
+                //}
+                //    if (Avx2.IsSupported)
+                //    {
+                //    } else if (Avx.IsSupported) {
+                //} else if (Sse42.IsSupported) {
+            } else {
+                for (var i = 0; i < m_Size; i++) {
+                    if ((m_Keys[i] != other.m_Keys[i]) || !m_Values[i].Equals(other.m_Values[i])) {
+                        return false;
+                    }
                 }
             }
-
             return true;
         }
 

@@ -7,6 +7,7 @@ namespace RoaringBitmap.Benchmark.MicroBenchmarks
     public abstract class MicroBenchmark
     {
         private readonly Collections.Special.RoaringBitmap[] m_Bitmaps;
+        private readonly Collections.Special.Simd.RoaringBitmap[] m_SimdBitmaps;
 
         protected MicroBenchmark(string fileName)
         {
@@ -15,6 +16,7 @@ namespace RoaringBitmap.Benchmark.MicroBenchmarks
             using (var provider = new ZipRealDataProvider(Path.Combine(m_Path, fileName)))
             {
                 m_Bitmaps = provider.ToArray();
+                m_SimdBitmaps = provider.ToSimdArray().ToArray();
             }
         }
 
@@ -30,54 +32,63 @@ namespace RoaringBitmap.Benchmark.MicroBenchmarks
         }
 
         [Benchmark]
-        public long Xor()
-        {
+        public long OrSimd() {
             var total = 0L;
-            for (var k = 0; k < m_Bitmaps.Length - 1; k++)
-            {
-                total += (m_Bitmaps[k] ^ m_Bitmaps[k + 1]).Cardinality;
+            for (var k = 0; k < m_Bitmaps.Length - 1; k++) {
+                total += (m_SimdBitmaps[k] | m_SimdBitmaps[k + 1]).Cardinality;
             }
             return total;
         }
 
-        [Benchmark]
-        public long And()
-        {
-            var total = 0L;
-            for (var k = 0; k < m_Bitmaps.Length - 1; k++)
-            {
-                total += (m_Bitmaps[k] & m_Bitmaps[k + 1]).Cardinality;
-            }
-            return total;
-        }
+        //[Benchmark]
+        //public long Xor()
+        //{
+        //    var total = 0L;
+        //    for (var k = 0; k < m_Bitmaps.Length - 1; k++)
+        //    {
+        //        total += (m_Bitmaps[k] ^ m_Bitmaps[k + 1]).Cardinality;
+        //    }
+        //    return total;
+        //}
 
-        [Benchmark]
-        public long AndNot()
-        {
-            var total = 0L;
-            for (var k = 0; k < m_Bitmaps.Length - 1; k++)
-            {
-                total += Collections.Special.RoaringBitmap.AndNot(m_Bitmaps[k], m_Bitmaps[k + 1]).Cardinality;
-            }
-            return total;
-        }
+        //[Benchmark]
+        //public long And()
+        //{
+        //    var total = 0L;
+        //    for (var k = 0; k < m_Bitmaps.Length - 1; k++)
+        //    {
+        //        total += (m_Bitmaps[k] & m_Bitmaps[k + 1]).Cardinality;
+        //    }
+        //    return total;
+        //}
+
+        //[Benchmark]
+        //public long AndNot()
+        //{
+        //    var total = 0L;
+        //    for (var k = 0; k < m_Bitmaps.Length - 1; k++)
+        //    {
+        //        total += Collections.Special.RoaringBitmap.AndNot(m_Bitmaps[k], m_Bitmaps[k + 1]).Cardinality;
+        //    }
+        //    return total;
+        //}
 
 
-        [Benchmark]
-        public long Iterate()
-        {
-            var total = 0L;
-            foreach (var roaringBitmap in m_Bitmaps)
-            {
-                foreach (var @int in roaringBitmap)
-                {
-                    unchecked
-                    {
-                        total += @int;
-                    }
-                }
-            }
-            return total;
-        }
+        //[Benchmark]
+        //public long Iterate()
+        //{
+        //    var total = 0L;
+        //    foreach (var roaringBitmap in m_Bitmaps)
+        //    {
+        //        foreach (var @int in roaringBitmap)
+        //        {
+        //            unchecked
+        //            {
+        //                total += @int;
+        //            }
+        //        }
+        //    }
+        //    return total;
+        //}
     }
 }

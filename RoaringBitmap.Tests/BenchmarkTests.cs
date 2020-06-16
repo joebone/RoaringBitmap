@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using RoaringBitmap.Benchmark;
@@ -33,6 +34,7 @@ namespace RoaringBitmap.Tests
         [InlineData(DataSets.WikileaksNoQuotesSrt, 574463)]
         public void Or(string name, int value)
         {
+            var sw = Stopwatch.StartNew();
             var bitmaps = m_Fixture.GetBitmaps(name);
             Assert.NotNull(bitmaps);
             var total = 0L;
@@ -41,6 +43,50 @@ namespace RoaringBitmap.Tests
                 total += (bitmaps[k] | bitmaps[k + 1]).Cardinality;
             }
             Assert.Equal(value, total);
+            m_OutputHelper.WriteLine($"Done in {sw.Elapsed.TotalMilliseconds:0.000}ms");
+        }
+
+        [Theory]
+        [InlineData(DataSets.CensusIncome, 12487395)]
+        [InlineData(DataSets.Census1881, 2007691)]
+        [InlineData(DataSets.Dimension003, 7733676)]
+        [InlineData(DataSets.Dimension008, 5555233)]
+        [InlineData(DataSets.Dimension033, 7579526)]
+        [InlineData(DataSets.UsCensus2000, 11954)]
+        [InlineData(DataSets.WeatherSept85, 24729002)]
+        [InlineData(DataSets.WikileaksNoQuotes, 541893)]
+        [InlineData(DataSets.CensusIncomeSrt, 11257282)]
+        [InlineData(DataSets.Census1881Srt, 1360167)]
+        [InlineData(DataSets.WeatherSept85Srt, 30863347)]
+        [InlineData(DataSets.WikileaksNoQuotesSrt, 574463)]
+        public void OrSimd(string name, int value) {
+            var sw = Stopwatch.StartNew();
+            var bitmaps = m_Fixture.GetSimdBitmaps(name);
+            Assert.NotNull(bitmaps);
+            var total = 0L;
+            for (var k = 0; k < bitmaps.Length - 1; k++) {
+                total += (bitmaps[k] | bitmaps[k + 1]).Cardinality;
+            }
+            Assert.Equal(value, total);
+            m_OutputHelper.WriteLine($"Done in {sw.Elapsed.TotalMilliseconds:0.000}ms");
+        }
+
+        [Fact]
+        public void OrSimdManual() {
+            var sw = Stopwatch.StartNew();
+            var aa = Collections.Special.Simd.RoaringBitmap.Create(1,3,5,7,8,9,11,12,13,14,15);
+            var bb= Collections.Special.Simd.RoaringBitmap.Create(2,4,6,8,9,10);
+
+            Assert.Equal(15, (aa | bb).Cardinality);
+
+            //var bitmaps = m_Fixture.GetSimdBitmaps(name);
+            //Assert.NotNull(bitmaps);
+            //var total = 0L;
+            //for (var k = 0; k < bitmaps.Length - 1; k++) {
+            //    total += (bitmaps[k] | bitmaps[k + 1]).Cardinality;
+            //}
+            //Assert.Equal(value, total);
+            m_OutputHelper.WriteLine($"Done in {sw.Elapsed.TotalMilliseconds:0.000}ms");
         }
 
         [Theory]
@@ -208,6 +254,7 @@ namespace RoaringBitmap.Tests
         public class BenchmarkTestsFixture
         {
             private readonly Dictionary<string, Collections.Special.RoaringBitmap[]> m_BitmapDictionary = new Dictionary<string, Collections.Special.RoaringBitmap[]>();
+            private readonly Dictionary<string, Collections.Special.Simd.RoaringBitmap[]> m_SimdBitmapDictionary = new Dictionary<string, Collections.Special.Simd.RoaringBitmap[]>();
             private readonly string m_Path = @"Data";
 
             public Collections.Special.RoaringBitmap[] GetBitmaps(string name)
@@ -219,6 +266,17 @@ namespace RoaringBitmap.Tests
 
                     bitmaps = provider.ToArray();
                     m_BitmapDictionary[name] = bitmaps;
+                }
+                return bitmaps;
+            }
+
+            public Collections.Special.Simd.RoaringBitmap[] GetSimdBitmaps(string name) {
+                Collections.Special.Simd.RoaringBitmap[] bitmaps;
+                if (!m_SimdBitmapDictionary.TryGetValue(name, out bitmaps)) {
+                    using var provider = new ZipRealDataProvider(Path.Combine(m_Path, name));
+
+                    bitmaps = provider.ToSimdArray().ToArray();
+                    m_SimdBitmapDictionary[name] = bitmaps;
                 }
                 return bitmaps;
             }

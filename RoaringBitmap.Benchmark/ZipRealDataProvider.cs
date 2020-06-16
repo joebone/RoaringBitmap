@@ -37,6 +37,18 @@ namespace RoaringBitmap.Benchmark
             }
         }
 
+        public IEnumerable<Collections.Special.Simd.RoaringBitmap> ToSimdArray() {
+            foreach (var zipArchiveEntry in m_Archive.Entries) {
+                using var stream = zipArchiveEntry.Open();
+                using var stringReader = new StreamReader(stream);
+
+                var split = stringReader.ReadLine().Split(',');
+                var values = split.Select(int.Parse).ToList();
+                var bitmap = Collections.Special.Simd.RoaringBitmap.Create(values);
+                yield return bitmap.Optimize();
+            }
+        }
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
