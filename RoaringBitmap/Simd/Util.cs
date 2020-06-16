@@ -101,7 +101,6 @@ namespace Collections.Special.Simd {
             if (0 == length1) {
                 return 0;
             }
-            Avx2.exc
             var s1 = set1[k1];
             var s2 = set2[k2];
             while (true) {
