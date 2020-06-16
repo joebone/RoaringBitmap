@@ -39,52 +39,50 @@ namespace Collections.Special.Simd {
                 return length2;
             }
 
-            //var pos = 0;
-            //int k1 = 0, k2 = 0;
             int bufferSize = buffer.Length * sizeof(ushort);
             unsafe {
-                fixed (ushort* srcPtrRO = set1) //&set1[k1]
-                fixed (ushort* cmpPtrRO = set2)  //&set2[k2]
+                fixed (ushort* srcPtrStart = set1) //&set1[k1]
+                fixed (ushort* cmpPtrStart = set2)  //&set2[k2]
                 fixed (ushort* bfrRO = buffer) {
-                    ushort* srcPtr = srcPtrRO;
-                    ushort* cmpPtr = cmpPtrRO;
+                    ushort* set1Ptr = srcPtrStart;
+                    ushort* set2Ptr = cmpPtrStart;
                     ushort* bufferPtr = bfrRO;
 
-                    var endSrc = srcPtr + length1;
-                    var endCmp = cmpPtr + length2;
+                    var endSet1 = set1Ptr + length1;
+                    var endSet2 = set2Ptr + length2;
 
                     while (true) {
-                        ushort v1 = *srcPtr;
-                        ushort v2 = *cmpPtr;
+                        ushort v1 = *set1Ptr;
+                        ushort v2 = *set2Ptr;
 
                         if (v1 < v2) {
                             *bufferPtr++ = v1;
-                            ++srcPtr;
-                            if (srcPtr >= endSrc) {
-                                Buffer.MemoryCopy(cmpPtr, bufferPtr, bufferSize, (endCmp - cmpPtr) * sizeof(ushort));
-                                long k2x = (cmpPtr - cmpPtrRO), posx = (bufferPtr - bfrRO);
+                            ++set1Ptr;
+                            if (set1Ptr >= endSet1) {
+                                Buffer.MemoryCopy(set2Ptr, bufferPtr, bufferSize, (endSet2 - set2Ptr) * sizeof(ushort));
+                                long k2x = (set2Ptr - cmpPtrStart), posx = (bufferPtr - bfrRO);
                                 return (int)(posx + length2 - k2x);
                             }
                         } else if (v1 == v2) {
-                            *bufferPtr++ = v1; //buffer[pos++] = s1;
-                            ++srcPtr; //++k1;
-                            ++cmpPtr; //++k2;
-                            if (srcPtr >= endSrc) {
-                                Buffer.MemoryCopy(cmpPtr, bufferPtr, bufferSize, (endCmp - cmpPtr) * sizeof(ushort));
-                                long k2x = (cmpPtr - cmpPtrRO), posx = (bufferPtr - bfrRO);
+                            *bufferPtr++ = v1;
+                            ++set1Ptr;
+                            ++set2Ptr;
+                            if (set1Ptr >= endSet1) {
+                                Buffer.MemoryCopy(set2Ptr, bufferPtr, bufferSize, (endSet2 - set2Ptr) * sizeof(ushort));
+                                long k2x = (set2Ptr - cmpPtrStart), posx = (bufferPtr - bfrRO);
                                 return (int)(posx + length2 - k2x);
                             }
-                            if (cmpPtr >= endCmp) {
-                                Buffer.MemoryCopy(srcPtr, bufferPtr, bufferSize, (endSrc - srcPtr) * sizeof(ushort));
-                                long k1x = (srcPtr - srcPtrRO), posx = (bufferPtr - bfrRO);
+                            if (set2Ptr >= endSet2) {
+                                Buffer.MemoryCopy(set1Ptr, bufferPtr, bufferSize, (endSet1 - set1Ptr) * sizeof(ushort));
+                                long k1x = (set1Ptr - srcPtrStart), posx = (bufferPtr - bfrRO);
                                 return (int)(posx + length1 - k1x);
                             }
                         } else { // if (set1[k1]>set2[k2])
                             *bufferPtr++ = v2; //buffer[pos++] = s2;
-                            ++cmpPtr;//++k2;
-                            if (cmpPtr >= endCmp) {
-                                Buffer.MemoryCopy(srcPtr, bufferPtr, bufferSize, (endSrc - srcPtr) * sizeof(ushort));
-                                long k1x = (srcPtr - srcPtrRO), posx = (bufferPtr - bfrRO);
+                            ++set2Ptr;//++k2;
+                            if (set2Ptr >= endSet2) {
+                                Buffer.MemoryCopy(set1Ptr, bufferPtr, bufferSize, (endSet1 - set1Ptr) * sizeof(ushort));
+                                long k1x = (set1Ptr - srcPtrStart), posx = (bufferPtr - bfrRO);
                                 return (int)(posx + length1 - k1x);
                             }
                         }
@@ -103,6 +101,7 @@ namespace Collections.Special.Simd {
             if (0 == length1) {
                 return 0;
             }
+            Avx2.exc
             var s1 = set1[k1];
             var s2 = set2[k2];
             while (true) {

@@ -20,4 +20,8 @@
     <Guid>2ee1be04-a8f5-4358-bf08-e417d3916b49</Guid>-->
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Juan\" />
+  </ItemGroup>
+
 </Project>

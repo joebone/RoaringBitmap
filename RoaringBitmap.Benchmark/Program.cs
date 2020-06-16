@@ -22,8 +22,8 @@ namespace RoaringBitmap.Benchmark
                         .WithPlatform(Platform.X64) // Run as x64 application
                         .WithOutlierMode(Perfolizer.Mathematics.OutlierDetection.OutlierMode.RemoveAll)
                         .WithStrategy(BenchmarkDotNet.Engines.RunStrategy.Throughput)
-                        .WithMinWarmupCount(1).WithMaxWarmupCount(3)
-                        .WithMinIterationCount(10).WithMaxIterationCount(20)
+                        .WithMinWarmupCount(1).WithMaxWarmupCount(5)
+                        .WithMinIterationCount(10).WithMaxIterationCount(50)
                 );
 
             //BenchmarkRunner.Run
