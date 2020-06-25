@@ -1,33 +1,50 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
 namespace Collections.Special.Simd {
     internal class BitmapContainer : Container, IEquatable<BitmapContainer> {
+
+        private static ArrayPool<ulong> pool = ArrayPool<ulong>.Shared;
+
+        /// <summary>
+        /// MUST be divisible by Vector256<byte>.Count
+        /// </summary>
         private const int BitmapLength = 1024;
         public static readonly BitmapContainer One;
         private readonly ulong[] m_Bitmap;
         private readonly int m_Cardinality;
+        private readonly bool pooledBuffer;
 
         static BitmapContainer() {
             var data = new ulong[BitmapLength];
             for (var i = 0; i < BitmapLength; i++) {
                 data[i] = ulong.MaxValue;
             }
-            One = new BitmapContainer(1 << 16, data);
+            One = new BitmapContainer(1 << 16, data, false);
         }
 
+        ~BitmapContainer() {
+            if (pooledBuffer && m_Bitmap != null) {
+                pool.Return(m_Bitmap);
+            }
+        }
         private BitmapContainer(int cardinality) {
-            m_Bitmap = new ulong[BitmapLength];
+            m_Bitmap = pool.Rent(BitmapLength);
+            pooledBuffer = true;
+            //m_Bitmap = new ulong[BitmapLength];
             m_Cardinality = cardinality;
         }
 
-        private BitmapContainer(int cardinality, ulong[] data) {
+        private BitmapContainer(int cardinality, ulong[] data, bool isPooled) {
             m_Bitmap = data;
             m_Cardinality = cardinality;
+            pooledBuffer = isPooled;
         }
 
         private BitmapContainer(int cardinality, ushort[] values, bool negated) : this(negated ? MaxCapacity - cardinality : cardinality) {
@@ -51,7 +68,7 @@ namespace Collections.Special.Simd {
 
         public override int ArraySizeInBytes => MaxCapacity / 8;
 
-        public bool Equals(BitmapContainer other) {
+        public unsafe bool Equals(BitmapContainer other) {
             if (ReferenceEquals(this, other)) {
                 return true;
             }
@@ -61,11 +78,21 @@ namespace Collections.Special.Simd {
             if (m_Cardinality != other.m_Cardinality) {
                 return false;
             }
-            for (var i = 0; i < BitmapLength; i++) {
-                if (m_Bitmap[i] != other.m_Bitmap[i]) {
-                    return false;
+
+            if (m_Cardinality == (BitmapLength * 64) && other.m_Cardinality == (BitmapLength * 64)) {
+                return true;
+            }
+
+            fixed (ulong* ptra = m_Bitmap)
+            fixed (ulong* ptrb = other.m_Bitmap) {
+                var AllSet = Vector256.Create((byte)0xFF);
+                for (int i = 0; i < BitmapLength; i+=16) {
+                    var x = Avx2.CompareEqual(Avx2.LoadDquVector256(ptra + i), Avx2.LoadDquVector256(ptrb + i)).AsByte();
+                    if (!Avx2.TestC(x, AllSet))
+                        return false;
                 }
             }
+
             return true;
         }
 
@@ -84,7 +111,7 @@ namespace Collections.Special.Simd {
 
 
         internal static BitmapContainer CreateXor(ushort[] first, int firstCardinality, ushort[] second, int secondCardinality) {
-            var data = new ulong[BitmapLength];
+            var data = pool.Rent(BitmapLength);
             for (var i = 0; i < firstCardinality; i++) {
                 var v = first[i];
                 data[v >> 6] ^= 1UL << v;
@@ -95,7 +122,7 @@ namespace Collections.Special.Simd {
                 data[v >> 6] ^= 1UL << v;
             }
             var cardinality = Util.BitCount(data);
-            return new BitmapContainer(cardinality, data);
+            return new BitmapContainer(cardinality, data, true);
         }
 
         /// <summary>
@@ -103,13 +130,13 @@ namespace Collections.Special.Simd {
         ///     .NET
         /// </summary>
         public static Container operator &(BitmapContainer x, BitmapContainer y) {
-            var data = Clone(x.m_Bitmap);
-            var bc = new BitmapContainer(AndInternal(data, y.m_Bitmap), data);
+            var data = Clone(x.m_Bitmap, true);
+            var bc = new BitmapContainer(AndInternal(data, y.m_Bitmap), data, true);
             return bc.m_Cardinality <= MaxSize ? (Container)ArrayContainer.Create(bc) : bc;
         }
 
-        private static ulong[] Clone(ulong[] data) {
-            var result = new ulong[BitmapLength];
+        private static ulong[] Clone(ulong[] data, bool pooled) {
+            var result = pooled ? pool.Rent(BitmapLength) : new ulong[BitmapLength];
             Buffer.BlockCopy(data, 0, result, 0, BitmapLength * sizeof(ulong));
             return result;
         }
@@ -119,18 +146,18 @@ namespace Collections.Special.Simd {
         }
 
         public static BitmapContainer operator |(BitmapContainer x, BitmapContainer y) {
-            var data = Clone(x.m_Bitmap);
-            return new BitmapContainer(OrInternal(data, y.m_Bitmap), data);
+            var data = Clone(x.m_Bitmap, true);
+            return new BitmapContainer(OrInternal(data, y.m_Bitmap), data, true);
         }
 
         public static BitmapContainer operator |(BitmapContainer x, ArrayContainer y) {
-            var data = Clone(x.m_Bitmap);
-            return new BitmapContainer(x.m_Cardinality + y.OrArray(data), data);
+            var data = Clone(x.m_Bitmap, true);
+            return new BitmapContainer(x.m_Cardinality + y.OrArray(data), data, true);
         }
 
         public static Container operator ~(BitmapContainer x) {
-            var data = Clone(x.m_Bitmap);
-            var bc = new BitmapContainer(NotInternal(data), data);
+            var data = Clone(x.m_Bitmap, true);
+            var bc = new BitmapContainer(NotInternal(data), data, true);
             return bc.m_Cardinality <= MaxSize ? (Container)ArrayContainer.Create(bc) : bc;
         }
 
@@ -139,27 +166,27 @@ namespace Collections.Special.Simd {
         ///     .NET
         /// </summary>
         public static Container operator ^(BitmapContainer x, BitmapContainer y) {
-            var data = Clone(x.m_Bitmap);
-            var bc = new BitmapContainer(XorInternal(data, y.m_Bitmap), data);
+            var data = Clone(x.m_Bitmap, true);
+            var bc = new BitmapContainer(XorInternal(data, y.m_Bitmap), data, true);
             return bc.m_Cardinality <= MaxSize ? (Container)ArrayContainer.Create(bc) : bc;
         }
 
 
         public static Container operator ^(BitmapContainer x, ArrayContainer y) {
-            var data = Clone(x.m_Bitmap);
-            var bc = new BitmapContainer(x.m_Cardinality + y.XorArray(data), data);
+            var data = Clone(x.m_Bitmap, true);
+            var bc = new BitmapContainer(x.m_Cardinality + y.XorArray(data), data, true);
             return bc.m_Cardinality <= MaxSize ? (Container)ArrayContainer.Create(bc) : bc;
         }
 
         public static Container AndNot(BitmapContainer x, BitmapContainer y) {
-            var data = Clone(x.m_Bitmap);
-            var bc = new BitmapContainer(AndNotInternal(data, y.m_Bitmap), data);
+            var data = Clone(x.m_Bitmap, true);
+            var bc = new BitmapContainer(AndNotInternal(data, y.m_Bitmap), data, true);
             return bc.m_Cardinality <= MaxSize ? (Container)ArrayContainer.Create(bc) : bc;
         }
 
         public static Container AndNot(BitmapContainer x, ArrayContainer y) {
-            var data = Clone(x.m_Bitmap);
-            var bc = new BitmapContainer(x.m_Cardinality + y.AndNotArray(data), data);
+            var data = Clone(x.m_Bitmap, true);
+            var bc = new BitmapContainer(x.m_Cardinality + y.AndNotArray(data), data, true);
             return bc.m_Cardinality <= MaxSize ? (Container)ArrayContainer.Create(bc) : bc;
         }
 
@@ -173,15 +200,24 @@ namespace Collections.Special.Simd {
 
         private static int AndNotInternal(ulong[] first, ulong[] second) {
             for (var k = 0; k < first.Length; k++) {
-                first[k] = first[k] & ~second[k];
+                first[k] &= ~second[k];
             }
             var c = Util.BitCount(first);
             return c;
         }
 
-        private static int NotInternal(ulong[] data) {
-            for (var k = 0; k < BitmapLength; k++) {
-                data[k] = ~data[k];
+        private unsafe static int NotInternal(ulong[] data) {
+            fixed (ulong* ptrul = data) {
+                byte* ptr = (byte*)ptrul;
+                int i = 0;
+                var allOnes = Vector256.Create((byte)0xff);
+
+                // there is no NOT operation, the closest is XOR with allones
+                while (i < BitmapLength) {
+                    var va = Avx2.Xor(Avx.LoadVector256(ptr + i), allOnes);
+                    Avx.Store(ptr + i, va);
+                    i += Vector256<byte>.Count;
+                }
             }
             var c = Util.BitCount(data);
             return c;
@@ -202,16 +238,38 @@ namespace Collections.Special.Simd {
                     Vector256<ulong> va;
                     bool aligned = alignedfirst == firstPtr && alignedsecond == secondPtr;
 
+                    long diffA = 0, diffB = 0;
+                    //https://stackoverflow.com/questions/1951290/memory-alignment-of-classes-in-c
+
+                    /*
+Interesting look in the gears that run the machine. I have a bit of a problem explaining why there are multiple distinct values (I got 4) when a double can be aligned only two ways. 
+                    I think alignment to the CPU cache line plays a role as well, although that only adds up to 3 possible timings.
+Well, nothing you can do about it, the CLR only promises alignment for 4 byte values so that atomic updates on 32-bit machines are guaranteed. 
+                    This is not just an issue with managed code, C/C++ has this problem too. Looks like the chip makers need to solve this one.
+If it is critical then you could allocate unmanaged memory with Marshal.AllocCoTaskMem() and use an unsafe pointer that you can align just right.
+                    Same kind of thing you'd have to do if you allocate memory for code that uses SIMD instructions, they require a 16 byte alignment. Consider it a desperation-move though.
+                     */
+                    if (!aligned) {
+                        diffA = alignedfirst - firstPtr;
+                        diffB = alignedsecond - secondPtr;
+                        Console.WriteLine($"Diff A : {diffA}, Diff B: {diffB}");
+                        if (diffA == diffB) { // if we can treat them as aligned, but with an offset, then come back and do the rest...
+                            firstPtr = alignedfirst;
+                            secondPtr = alignedsecond;
+                            aligned = true;
+                        }
+                    }
+
                     if (aligned) {
                         while (i < BitmapLength) {
                             va = Avx.LoadAlignedVector256(alignedfirst);
                             va = Avx2.Or(va, Avx.LoadAlignedVector256(alignedsecond));
                             Avx.StoreAligned(alignedfirst, va);
 
-                            cardinality += (int)Popcnt.X64.PopCount(*alignedfirst++);
-                            cardinality += (int)Popcnt.X64.PopCount(*alignedfirst++);
-                            cardinality += (int)Popcnt.X64.PopCount(*alignedfirst++);
-                            cardinality += (int)Popcnt.X64.PopCount(*alignedfirst++);
+                            //cardinality += (int)Popcnt.X64.PopCount(*alignedfirst++);
+                            //cardinality += (int)Popcnt.X64.PopCount(*alignedfirst++);
+                            //cardinality += (int)Popcnt.X64.PopCount(*alignedfirst++);
+                            //cardinality += (int)Popcnt.X64.PopCount(*alignedfirst++);
 
                             //alignedfirst  +=4;
                             alignedsecond +=4;
@@ -221,24 +279,25 @@ namespace Collections.Special.Simd {
                         //var vaa = Avx.LoadAlignedVector256(srcPtr);
                         //var vab = Avx.LoadAlignedVector256(cmpPtr);
                         while (i < BitmapLength) {
-                            va = Avx.LoadVector256(firstPtr);
-                            va = Avx2.Or(va, Avx.LoadVector256(secondPtr));
+                            va = Avx2.Or(Avx.LoadVector256(firstPtr + i), Avx.LoadVector256(secondPtr + i));
                             Avx.Store(firstPtr, va);
 
-                            cardinality += (int)Popcnt.X64.PopCount(*firstPtr++);
-                            cardinality += (int)Popcnt.X64.PopCount(*firstPtr++);
-                            cardinality += (int)Popcnt.X64.PopCount(*firstPtr++);
-                            cardinality += (int)Popcnt.X64.PopCount(*firstPtr++);
-
-                            //firstPtr  +=4;
-                            secondPtr +=4;
+                            //cardinality += (int)Popcnt.X64.PopCount(*firstPtr++);
+                            //cardinality += (int)Popcnt.X64.PopCount(*firstPtr++);
+                            //cardinality += (int)Popcnt.X64.PopCount(*firstPtr++);
+                            //cardinality += (int)Popcnt.X64.PopCount(*firstPtr++);
                             i += 4; // 256 bit / 64 bit ulong
                         }
                     }
+                    if (i != BitmapLength) {
+                        // we jodge-jobbed an aligned-compare on unaligned data, and need to include recover the first and last blocks
+                        // as we only do this when the misalignment is equal ( 1/32 chance ) its an edge case, but when its hit, there is a marked improvement
+                        long a = diffA;
+                    }
                 }
             }
-
-            return cardinality;
+            return Util.BitCount(first);
+            //return cardinality;
             //for (var k = 0; k < BitmapLength; k++) {
             //    first[k] = first[k] | second[k];
             //}
@@ -319,11 +378,11 @@ namespace Collections.Special.Simd {
         }
 
         public static BitmapContainer Deserialize(BinaryReader binaryReader, int cardinality) {
-            var data = new ulong[BitmapLength];
+            var data = pool.Rent(BitmapLength);// new ulong[BitmapLength];
             for (var i = 0; i < BitmapLength; i++) {
                 data[i] = binaryReader.ReadUInt64();
             }
-            return new BitmapContainer(cardinality, data);
+            return new BitmapContainer(cardinality, data, true);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,6 +9,8 @@ using Xunit.Abstractions;
 
 namespace RoaringBitmap.Tests
 {
+    using Simd = Collections.Special.Simd;
+    using Juan = WebBeds.Indexing;
     public class BenchmarkTests : IClassFixture<BenchmarkTests.BenchmarkTestsFixture>
     {
         private readonly BenchmarkTestsFixture m_Fixture;
@@ -72,13 +75,111 @@ namespace RoaringBitmap.Tests
         }
 
         [Fact]
-        public void OrSimdManual() {
+        public void OrSimdManualCoverage() {
             var sw = Stopwatch.StartNew();
-            var aa = Collections.Special.Simd.RoaringBitmap.Create(1,3,5,7,8,9,11,12,13,14,15);
-            var bb= Collections.Special.Simd.RoaringBitmap.Create(2,4,6,8,9,10);
+            var aa = Simd.RoaringBitmap.Create(1,3,5,7,8,9,11,12,13,14,15);
+            var bb= Simd.RoaringBitmap.Create(2,4,6,8,9,10);
 
             Assert.Equal(15, (aa | bb).Cardinality);
 
+
+            aa = Simd.RoaringBitmap.Create(Enumerable.Range(0, 76636));
+            aa.Optimize();
+
+            bb = Simd.RoaringBitmap.Create(Enumerable.Range(0, 65536).Concat(Enumerable.Range(65538, 11100)));
+            bb.Optimize();
+
+            Assert.False(aa.Equals(bb));
+
+            aa = Simd.RoaringBitmap.Create(Enumerable.Range(0, 65536).Concat(Enumerable.Range(65538, 11100)));
+            aa.Optimize();
+
+            Assert.True(aa.Equals(bb));
+
+
+            aa = Simd.RoaringBitmap.Create(1,3,5,7,8,9);
+            bb= Simd.RoaringBitmap.Create(2,4,6,8,9,10,11,12,13,14,15, int.MaxValue);
+
+            Assert.Equal(16, (aa | bb).Cardinality);
+
+            aa = Simd.RoaringBitmap.Create(1, 3, 5, 7, 8, 9, 11, 12, 13, 14, 15);
+            bb= Simd.RoaringBitmap.Create(2, 4, 6, 8, 9, 10, 11, 12, 13, 14, 15);
+
+            Assert.Equal(15, (aa | bb).Cardinality);
+
+            aa = Simd.RoaringBitmap.Create(1, 3, 5, 7, 8, 9, 11, 12, 13, 14, 15, int.MaxValue);
+            bb= Simd.RoaringBitmap.Create(2, 4, 6, 8, 9, 10, 11, 12, 13, 14, 15);
+
+            Assert.Equal(16, (aa | bb).Cardinality);
+
+            const int Im = 1_000_000;
+            aa = Simd.RoaringBitmap.Create(1, 2, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, int.MaxValue);
+            bb= Simd.RoaringBitmap.Create(4, 6, Im + 12, Im + 13, Im +  14, Im + 15);
+
+            Assert.Equal(20, (aa | bb).Cardinality);
+
+            var jac = new Juan.RoaringBitmap(Enumerable.Range(10, 5));
+            Assert.Equal(5, jac.Cardinality);
+
+
+            const int loops = 500;
+
+            var jaa = new Juan.RoaringBitmap(Enumerable.Range(10000, 5000));
+            var jbb = new Juan.RoaringBitmap(Enumerable.Range(5000, 1000));
+            jaa.Optimize();
+            jbb.Optimize();
+            var jproduct = (jaa | jbb);
+            Assert.Equal(6000, jproduct.Cardinality);
+
+            aa = Simd.RoaringBitmap.Create(Enumerable.Range(10000, 5000));
+            bb = Simd.RoaringBitmap.Create(Enumerable.Range(5000, 1000));
+            aa.Optimize();
+            bb.Optimize();
+            var product = (aa | bb);
+
+            const int Megs = 1024 * 1024;
+
+            Assert.Equal(6000, product.Cardinality);
+            GC.Collect(2, GCCollectionMode.Forced);
+            GC.TryStartNoGCRegion(256 * Megs, true);
+
+            var sw1 = Stopwatch.StartNew();
+            for (int i = 0; i < loops; i++) {
+                jproduct = (jaa | jbb);
+            }
+            sw1.Stop();
+            GC.EndNoGCRegion();
+            
+            GC.Collect(2, GCCollectionMode.Forced);
+            GC.TryStartNoGCRegion(256 * Megs, true);
+
+            var sw2 = Stopwatch.StartNew();
+            for (int i = 0; i < loops; i++) {
+                product = (aa | bb);
+            }
+            sw2.Stop();
+            GC.EndNoGCRegion();
+
+            int[] ja = jproduct.ToArray(), sa = product.ToArray();
+            var set_difference = ja.Except(sa).Concat(sa.Except(ja)).ToArray();
+            if(set_difference.Length > 0) {
+                throw new ArgumentException($"There is a set difference between the result of the two OR operations. : {string.Join(", ", set_difference)}");
+            }
+            //Assert.Equal(ja, sa, "Aasdkjnasd");
+            var factor = ((sw1.Elapsed.TotalMilliseconds / sw2.Elapsed.TotalMilliseconds) - 1) * 100;
+            m_OutputHelper.WriteLine($"Loops: {loops} Speedup: {factor:0.00}%, WB: {sw1.Elapsed.TotalMilliseconds}, JB:{sw2.Elapsed.TotalMilliseconds}");
+            //Assert.True(sw2.Elapsed < sw1.Elapsed, "Is it faster?");
+
+
+            jaa = new Juan.RoaringBitmap(Enumerable.Range(0, 15000));
+            jbb = new Juan.RoaringBitmap(Enumerable.Range(5000, 20000));
+            jproduct = (jaa | jbb);
+            Assert.Equal(25000, jproduct.Cardinality); // 0000 - 25000, really should be 0 
+
+            aa = Simd.RoaringBitmap.Create(Enumerable.Range(0, 15000));
+            bb = Simd.RoaringBitmap.Create(Enumerable.Range(5000, 20000));
+            product = (aa | bb);
+            Assert.Equal(25000, product.Cardinality); // 0000 - 25000, really should be 0 
             //var bitmaps = m_Fixture.GetSimdBitmaps(name);
             //Assert.NotNull(bitmaps);
             //var total = 0L;

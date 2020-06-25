@@ -1,9 +1,405 @@
 ﻿<ProjectConfiguration>
   <Settings>
     <IgnoredTests>
-      <FixtureTestSelector>
-        <FixtureName>RoaringBitmap.Tests.BenchmarkTests</FixtureName>
-      </FixtureTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("wikileaks-noquotes_srt.zip", "574311")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("wikileaks-noquotes.zip", "538566")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("weather_sept_85_srt.zip", "29800358")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("weather_sept_85.zip", "24086983")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("uscensus2000.zip", "11954")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("dimension_033.zip", "7579526")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("dimension_008.zip", "5442916")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("dimension_003.zip", "7733676")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("census-income_srt.zip", "10329567")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("census-income.zip", "11241947")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("census1881_srt.zip", "1359961")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Xor("census1881.zip", "2007668")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("wikileaks-noquotes_srt.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("wikileaks-noquotes.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("weather_sept_85_srt.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("weather_sept_85.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("uscensus2000.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("dimension_033.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("dimension_008.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("dimension_003.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("census-income_srt.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("census-income.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("census1881_srt.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.SerializeDeserialize("census1881.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("wikileaks-noquotes_srt.zip", "574463")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("wikileaks-noquotes.zip", "541893")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("weather_sept_85_srt.zip", "30863347")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("weather_sept_85.zip", "24729002")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("uscensus2000.zip", "11954")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("dimension_033.zip", "7579526")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("dimension_008.zip", "5555233")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("dimension_003.zip", "7733676")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("census-income_srt.zip", "11257282")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("census-income.zip", "12487395")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("census1881_srt.zip", "1360167")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Or("census1881.zip", "2007691")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Not("wikileaks-noquotes_srt.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Not("wikileaks-noquotes.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Not("weather_sept_85_srt.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Not("weather_sept_85.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Not("uscensus2000.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Not("census-income_srt.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Not("census-income.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Not("census1881_srt.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Not("census1881.zip")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("wikileaks-noquotes_srt.zip", "1921022163")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("wikileaks-noquotes.zip", "413846869")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("weather_sept_85_srt.zip", "1132748056")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("weather_sept_85.zip", "644036874")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("uscensus2000.zip", "-1260727955")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("dimension_033.zip", "-1287135055")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("dimension_008.zip", "-423436314")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("dimension_003.zip", "-1287135055")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("census-income_srt.zip", "-679313956")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("census-income.zip", "-942184551")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("census1881_srt.zip", "445584405")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.Iterate("census1881.zip", "246451066")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("wikileaks-noquotes_srt.zip", "286904")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("wikileaks-noquotes.zip", "271605")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("weather_sept_85_srt.zip", "14935706")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("weather_sept_85.zip", "11960876")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("uscensus2000.zip", "5970")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("dimension_033.zip", "3866842")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("dimension_008.zip", "2721459")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("dimension_003.zip", "3866831")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("census-income_srt.zip", "5164671")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("census-income.zip", "5666586")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("census1881_srt.zip", "679375")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.AndNot("census1881.zip", "1003836")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("wikileaks-noquotes_srt.zip", "152")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("wikileaks-noquotes.zip", "3327")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("weather_sept_85_srt.zip", "1062989")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("weather_sept_85.zip", "642019")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("uscensus2000.zip", "0")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("dimension_033.zip", "0")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("dimension_008.zip", "112317")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("dimension_003.zip", "0")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("census-income_srt.zip", "927715")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("census-income.zip", "1245448")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("census1881_srt.zip", "206")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.And("census1881.zip", "23")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("census1881.zip", "2007691")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("census1881_srt.zip", "1360167")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("census-income.zip", "12487395")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("census-income_srt.zip", "11257282")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("dimension_003.zip", "7733676")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("dimension_008.zip", "5555233")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("dimension_033.zip", "7579526")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("uscensus2000.zip", "11954")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("weather_sept_85.zip", "24729002")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("weather_sept_85_srt.zip", "30863347")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("wikileaks-noquotes.zip", "541893")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.BenchmarkTests.OrSimd("wikileaks-noquotes_srt.zip", "574463")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.AndDisjunct</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.AndNotDisjunct</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.AndNotPartiallyArrayContainer</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.AndNotPartiallyBitmapContainerArrayContainerResult</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.AndNotPartiallyBitmapContainerBitmapContainerResult</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.AndPartiallyArrayContainer</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.AndPartiallyBitmapContainerArrayContainerResult</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.AndPartiallyBitmapContainerBitmapContainerResult</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.AndPartiallySameMixedContainer</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.AndRandom</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.AndSame</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.BasicCreate</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.CardinalityOfEmptySet</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.CardinalityOfFullSet</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.Equal</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.LargeArray</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.MaxArray</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.Not</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.NotEqual</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.OptimizeFullSetArrayContainer</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.OptimizeFullSetBitmapContainer</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.OrDisjunct</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.OrRandom</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.OrSame</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.SerializeDeserialize</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.SerializeEmptySet</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.SerializeFullArrayContainer</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.SerializeFullBitContainer</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.SerializeFullSet</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.SerializeTestContainer</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.SmallArray</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.XorDisjunct</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.XorPartiallyArrayContainer</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.XorPartiallyBitmapContainerArrayContainerResult</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.XorPartiallyBitmapContainerBitmapContainerResult</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.XorPartiallySameMixedContainer</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.XorRandom</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.XorSame</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.DeSerializeTestContainers("bitmapwithoutruns.bin")</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>RoaringBitmap.Tests.RoaringBitmapTests.DeSerializeTestContainers("bitmapwithruns.bin")</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
   </Settings>
 </ProjectConfiguration>
