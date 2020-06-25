@@ -3,21 +3,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection.PortableExecutable;
+using System.Runtime.Intrinsics.X86;
 using RoaringBitmap.Benchmark;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace RoaringBitmap.Tests
-{
+namespace RoaringBitmap.Tests {
     using Simd = Collections.Special.Simd;
     using Juan = WebBeds.Indexing;
-    public class BenchmarkTests : IClassFixture<BenchmarkTests.BenchmarkTestsFixture>
-    {
+    public class BenchmarkTests : IClassFixture<BenchmarkTests.BenchmarkTestsFixture> {
         private readonly BenchmarkTestsFixture m_Fixture;
         private readonly ITestOutputHelper m_OutputHelper;
 
-        public BenchmarkTests(BenchmarkTestsFixture fixture, ITestOutputHelper outputHelper)
-        {
+        public BenchmarkTests(BenchmarkTestsFixture fixture, ITestOutputHelper outputHelper) {
             m_Fixture = fixture;
             m_OutputHelper = outputHelper;
         }
@@ -35,14 +34,12 @@ namespace RoaringBitmap.Tests
         [InlineData(DataSets.Census1881Srt, 1360167)]
         [InlineData(DataSets.WeatherSept85Srt, 30863347)]
         [InlineData(DataSets.WikileaksNoQuotesSrt, 574463)]
-        public void Or(string name, int value)
-        {
+        public void Or(string name, int value) {
             var sw = Stopwatch.StartNew();
             var bitmaps = m_Fixture.GetBitmaps(name);
             Assert.NotNull(bitmaps);
             var total = 0L;
-            for (var k = 0; k < bitmaps.Length - 1; k++)
-            {
+            for (var k = 0; k < bitmaps.Length - 1; k++) {
                 total += (bitmaps[k] | bitmaps[k + 1]).Cardinality;
             }
             Assert.Equal(value, total);
@@ -74,6 +71,69 @@ namespace RoaringBitmap.Tests
             m_OutputHelper.WriteLine($"Done in {sw.Elapsed.TotalMilliseconds:0.000}ms");
         }
 
+
+        [Fact]
+        public unsafe void AlignedArrayPoolTests() {
+            Assert.True(true);
+            const int PoolSize = 100;
+            const int ArraySize = 1024;
+            using var ap = new RoaringBitmap.Simd.AlignedInt64ArrayPool(ArraySize, PoolSize);
+
+            var MyArray = ap.Rent();
+            var sp = MyArray.Span;
+            sp[0] = 1;
+            sp[1] = 2;
+            //ap.Return(MyArray);
+            for (int i = 0; i < PoolSize - 1; i++) {
+                var newBlock = ap.Rent();
+                Assert.Equal(1024, newBlock.Span.Length);
+            }
+            Assert.Throws<InvalidOperationException>(() => ap.Rent());
+
+            ap.Return(MyArray);
+            //MyArray.
+            Assert.Equal(PoolSize - 1, ap.InUse);
+
+            var weirdoMemory = new Memory<ulong>(new [] { 5UL });
+
+            Assert.Throws<InvalidOperationException>(() => ap.Return(weirdoMemory));
+
+            ap.RepossessAll();
+
+            List<Memory<ulong>> mems = new List<Memory<ulong>>();
+            for (int i = 0; i < 100; i++) {
+                mems.Add(ap.Rent());
+            }
+            var rr = new Random();
+            ulong[][] allocs = new ulong[PoolSize][];
+
+            for (int i = 0; i < 1000000; i++) {
+                var pos = i % PoolSize;
+                allocs[i % PoolSize] = new ulong[ArraySize];
+            }
+
+            for (int i = 0; i < 1000000; i++) {
+                var pos = rr.Next(0, PoolSize);
+                ap.Return(mems[pos]);
+
+                mems[pos] = ap.Rent();
+            }
+
+            fixed (ulong* ptr = mems[0].Span) {
+                long Address = (long)ptr;
+                Console.WriteLine("{0:x}", Address);
+                try {
+                    var alignedVector = Avx2.LoadAlignedVector256(ptr);
+                } catch (Exception) {
+
+                }
+            }
+
+
+            Assert.Equal(2UL, MyArray.Slice(1, 1).Span[0]);
+
+        }
+
         [Fact]
         public void OrSimdManualCoverage() {
             var sw = Stopwatch.StartNew();
@@ -97,8 +157,8 @@ namespace RoaringBitmap.Tests
             Assert.True(aa.Equals(bb));
 
 
-            aa = Simd.RoaringBitmap.Create(1,3,5,7,8,9);
-            bb= Simd.RoaringBitmap.Create(2,4,6,8,9,10,11,12,13,14,15, int.MaxValue);
+            aa = Simd.RoaringBitmap.Create(1, 3, 5, 7, 8, 9);
+            bb= Simd.RoaringBitmap.Create(2, 4, 6, 8, 9, 10, 11, 12, 13, 14, 15, int.MaxValue);
 
             Assert.Equal(16, (aa | bb).Cardinality);
 
@@ -149,7 +209,7 @@ namespace RoaringBitmap.Tests
             }
             sw1.Stop();
             GC.EndNoGCRegion();
-            
+
             GC.Collect(2, GCCollectionMode.Forced);
             GC.TryStartNoGCRegion(256 * Megs, true);
 
@@ -162,7 +222,7 @@ namespace RoaringBitmap.Tests
 
             int[] ja = jproduct.ToArray(), sa = product.ToArray();
             var set_difference = ja.Except(sa).Concat(sa.Except(ja)).ToArray();
-            if(set_difference.Length > 0) {
+            if (set_difference.Length > 0) {
                 throw new ArgumentException($"There is a set difference between the result of the two OR operations. : {string.Join(", ", set_difference)}");
             }
             //Assert.Equal(ja, sa, "Aasdkjnasd");
@@ -203,13 +263,11 @@ namespace RoaringBitmap.Tests
         [InlineData(DataSets.Census1881Srt, 1359961)]
         [InlineData(DataSets.WeatherSept85Srt, 29800358)]
         [InlineData(DataSets.WikileaksNoQuotesSrt, 574311)]
-        public void Xor(string name, int value)
-        {
+        public void Xor(string name, int value) {
             var bitmaps = m_Fixture.GetBitmaps(name);
             Assert.NotNull(bitmaps);
             var total = 0L;
-            for (var k = 0; k < bitmaps.Length - 1; k++)
-            {
+            for (var k = 0; k < bitmaps.Length - 1; k++) {
                 total += (bitmaps[k] ^ bitmaps[k + 1]).Cardinality;
             }
             Assert.Equal(value, total);
@@ -228,13 +286,11 @@ namespace RoaringBitmap.Tests
         [InlineData(DataSets.Census1881Srt, 206)]
         [InlineData(DataSets.WeatherSept85Srt, 1062989)]
         [InlineData(DataSets.WikileaksNoQuotesSrt, 152)]
-        public void And(string name, int value)
-        {
+        public void And(string name, int value) {
             var bitmaps = m_Fixture.GetBitmaps(name);
             Assert.NotNull(bitmaps);
             var total = 0L;
-            for (var k = 0; k < bitmaps.Length - 1; k++)
-            {
+            for (var k = 0; k < bitmaps.Length - 1; k++) {
                 total += (bitmaps[k] & bitmaps[k + 1]).Cardinality;
             }
             Assert.Equal(value, total);
@@ -253,17 +309,13 @@ namespace RoaringBitmap.Tests
         [InlineData(DataSets.Census1881Srt, 445584405)]
         [InlineData(DataSets.WeatherSept85Srt, 1132748056)]
         [InlineData(DataSets.WikileaksNoQuotesSrt, 1921022163)]
-        public void Iterate(string name, int value)
-        {
+        public void Iterate(string name, int value) {
             var bitmaps = m_Fixture.GetBitmaps(name);
             Assert.NotNull(bitmaps);
             var total = 0;
-            foreach (var roaringBitmap in bitmaps)
-            {
-                foreach (var @int in roaringBitmap)
-                {
-                    unchecked
-                    {
+            foreach (var roaringBitmap in bitmaps) {
+                foreach (var @int in roaringBitmap) {
+                    unchecked {
                         total += @int;
                     }
                 }
@@ -286,12 +338,10 @@ namespace RoaringBitmap.Tests
         [InlineData(DataSets.Census1881Srt)]
         [InlineData(DataSets.WeatherSept85Srt)]
         [InlineData(DataSets.WikileaksNoQuotesSrt)]
-        public void Not(string name)
-        {
+        public void Not(string name) {
             var bitmaps = m_Fixture.GetBitmaps(name);
             Assert.NotNull(bitmaps);
-            foreach (var roaringBitmap in bitmaps)
-            {
+            foreach (var roaringBitmap in bitmaps) {
                 var doublenegated = ~~roaringBitmap;
                 Assert.Equal(roaringBitmap, doublenegated);
             }
@@ -310,13 +360,11 @@ namespace RoaringBitmap.Tests
         [InlineData(DataSets.Census1881Srt, 679375)]
         [InlineData(DataSets.WeatherSept85Srt, 14935706)]
         [InlineData(DataSets.WikileaksNoQuotesSrt, 286904)]
-        public void AndNot(string name, int value)
-        {
+        public void AndNot(string name, int value) {
             var bitmaps = m_Fixture.GetBitmaps(name);
             Assert.NotNull(bitmaps);
             var total = 0L;
-            for (var k = 0; k < bitmaps.Length - 1; k++)
-            {
+            for (var k = 0; k < bitmaps.Length - 1; k++) {
                 total += Collections.Special.RoaringBitmap.AndNot(bitmaps[k], bitmaps[k + 1]).Cardinality;
             }
             Assert.Equal(value, total);
@@ -335,14 +383,11 @@ namespace RoaringBitmap.Tests
         [InlineData(DataSets.Census1881Srt)]
         [InlineData(DataSets.WeatherSept85Srt)]
         [InlineData(DataSets.WikileaksNoQuotesSrt)]
-        public void SerializeDeserialize(string name)
-        {
+        public void SerializeDeserialize(string name) {
             var bitmaps = m_Fixture.GetBitmaps(name);
             Assert.NotNull(bitmaps);
-            foreach (var roaringBitmap in bitmaps)
-            {
-                using (var ms = new MemoryStream())
-                {
+            foreach (var roaringBitmap in bitmaps) {
+                using (var ms = new MemoryStream()) {
                     Collections.Special.RoaringBitmap.Serialize(roaringBitmap, ms);
                     ms.Position = 0;
                     var rb2 = Collections.Special.RoaringBitmap.Deserialize(ms);
@@ -352,17 +397,14 @@ namespace RoaringBitmap.Tests
         }
 
 
-        public class BenchmarkTestsFixture
-        {
+        public class BenchmarkTestsFixture {
             private readonly Dictionary<string, Collections.Special.RoaringBitmap[]> m_BitmapDictionary = new Dictionary<string, Collections.Special.RoaringBitmap[]>();
             private readonly Dictionary<string, Collections.Special.Simd.RoaringBitmap[]> m_SimdBitmapDictionary = new Dictionary<string, Collections.Special.Simd.RoaringBitmap[]>();
             private readonly string m_Path = @"Data";
 
-            public Collections.Special.RoaringBitmap[] GetBitmaps(string name)
-            {
+            public Collections.Special.RoaringBitmap[] GetBitmaps(string name) {
                 Collections.Special.RoaringBitmap[] bitmaps;
-                if (!m_BitmapDictionary.TryGetValue(name, out bitmaps))
-                {
+                if (!m_BitmapDictionary.TryGetValue(name, out bitmaps)) {
                     using var provider = new ZipRealDataProvider(Path.Combine(m_Path, name));
 
                     bitmaps = provider.ToArray();
